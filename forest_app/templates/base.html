@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waldbesitzer App</title>
+    {% load django_bootstrap5 %}
+    {% load leaflet_tags %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{% url 'start_screen' %}">Waldbesitzer App</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="{% url 'start_screen' %}">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Karte</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Über uns</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mt-4">
+        {% block content %}
+        <!-- Main content will be inserted here -->
+        {% endblock %}
+    </main>
+
+    <footer class="mt-5 text-center">
+        <p>&copy; 2023 Waldbesitzer App</p>
+    </footer>
+
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>

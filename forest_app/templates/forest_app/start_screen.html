@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load leaflet_tags %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Waldbesitzer App</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Karte</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Über uns</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <h1 class="mb-4">Willkommen in der Waldbesitzer App</h1>
+
+  <div class="row">
+    <div class="col-md-9">
+      <div id="map-container" style="height: 500px; border: 2px solid red;">
+        {% leaflet_map "main_map" callback="main_map_init" %}
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="d-grid gap-2">
+        <button id="btn-forests" class="btn btn-primary" onclick="switchGeodata('forests')">Wälder</button>
+        <button id="btn-rivers" class="btn btn-primary" onclick="switchGeodata('rivers')">Flüsse</button>
+        <button id="btn-cities" class="btn btn-primary" onclick="switchGeodata('cities')">Städte</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% leaflet_js %}
+{% leaflet_css %}
+<script>
+  var map;
+  var currentLayer;
+
+  function main_map_init(m, options) {
+    map = m;
+    // Set the initial view to a Europe-centered map
+    map.setView([50.0, 10.0], 4);
+
+    // Add a basic tile layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Initialize with forests data
+    switchGeodata('forests');
+  }
+
+  function switchGeodata(dataType) {
+    // Remove the current layer if it exists
+    if (currentLayer) {
+      map.removeLayer(currentLayer);
+    }
+
+    var data;
+    switch(dataType) {
+      case 'forests':
+        data = {
+          "type": "FeatureCollection",
+          "features": [
+            {"type": "Feature", "properties": {"name": "Schwarzwald"}, "geometry": {"type": "Point", "coordinates": [8.3, 48.6]}},
+            {"type": "Feature", "properties": {"name": "Bayerischer Wald"}, "geometry": {"type": "Point", "coordinates": [13.2, 49.1]}},
+            {"type": "Feature", "properties": {"name": "Harz"}, "geometry": {"type": "Point", "coordinates": [10.5, 51.8]}}
+          ]
+        };
+        break;
+      case 'rivers':
+        data = {
+          "type": "FeatureCollection",
+          "features": [
+            {"type": "Feature", "properties": {"name": "Rhein"}, "geometry": {"type": "Point", "coordinates": [8.3, 50.0]}},
+            {"type": "Feature", "properties": {"name": "Donau"}, "geometry": {"type": "Point", "coordinates": [12.5, 48.5]}},
+            {"type": "Feature", "properties": {"name": "Elbe"}, "geometry": {"type": "Point", "coordinates": [10.1, 53.5]}}
+          ]
+        };
+        break;
+      case 'cities':
+        data = {
+          "type": "FeatureCollection",
+          "features": [
+            {"type": "Feature", "properties": {"name": "Berlin"}, "geometry": {"type": "Point", "coordinates": [13.4, 52.5]}},
+            {"type": "Feature", "properties": {"name": "München"}, "geometry": {"type": "Point", "coordinates": [11.6, 48.1]}},
+            {"type": "Feature", "properties": {"name": "Hamburg"}, "geometry": {"type": "Point", "coordinates": [10.0, 53.6]}}
+          ]
+        };
+        break;
+    }
+
+    currentLayer = L.geoJSON(data, {
+      pointToLayer: function(feature, latlng) {
+        return L.circleMarker(latlng, {
+          radius: 8,
+          fillColor: "#ff7800",
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.8
+        });
+      },
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup(feature.properties.name);
+      }
+    }).addTo(map);
+  }
+</script>
+{% endblock %}
